@@ -1,15 +1,27 @@
 # Define tools here
+from asyncio import current_task
+
 import cv2
 import time
 from typing import Tuple
 
 class Tools:
     def __init__(self):
-        self.current_tool = 'circle'
+        self.current_tool = 'brush'
         self.tool_index = 0
+        self.rect_active = False
+        self.rect_start_time = None
 
     def change_tools(self):
-        pass
+        if self.tool_index == 0:
+            self.current_tool = 'circle'
+            self.tool_index = 1
+        elif self.tool_index == 1:
+            self.current_tool = 'square'
+            self.tool_index = 2
+        else:
+            self.current_tool = 'brush'
+            self.tool_index = 0
 
     def get_tools_list(self):
         pass

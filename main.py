@@ -11,15 +11,32 @@ cap = cv2.VideoCapture(0)
 canvas = np.zeros((480, 640, 3), dtype="uint8")
 
 prev_x, prev_y = 0, 0
+prev_circle_centre = (-5, -5)
 color = (255, 200, 149)
 brush_thickness = 2
 Tools = Tools()
+fist_start_time = None
+fist_triggered = False
 
+def euclidean_distance(p1, p2):
+    return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2) ** 0.5
 
 def fingers_up(lm_list):
     fingers = [lm_list[8][2] < lm_list[6][2], lm_list[12][2] < lm_list[10][2]]
     return fingers
 
+def is_fist(lm_list):
+    if not lm_list or len(lm_list) < 21:
+        return False
+
+    fingers_down = [
+        lm_list[8][2] > lm_list[6][2],    # index
+        lm_list[12][2] > lm_list[10][2],  # middle
+        lm_list[16][2] > lm_list[14][2],  # ring
+        lm_list[20][2] > lm_list[18][2],  # pinky
+    ]
+
+    return all(fingers_down)
 
 while True:
     success, img = cap.read()
@@ -33,6 +50,19 @@ while True:
         x2, y2 = lm_list[12][1], lm_list[12][2]
 
         fingers = fingers_up(lm_list)
+
+        if is_fist(lm_list):
+            if fist_start_time is None:
+                fist_start_time = time.time()
+
+            elapsed_time = time.time() - fist_start_time
+
+            if elapsed_time > 1 and not fist_triggered:
+                Tools.change_tools()
+                fist_triggered = True
+        else:
+            fist_triggered = False
+            fist_start_time = None
 
         if fingers[0] and fingers[1]:
             prev_x, prev_y = 0, 0
@@ -54,12 +84,15 @@ while True:
                 prev_x, prev_y = x1, y1
 
             if Tools.current_tool == 'circle':
-                Tools.draw_circle(canvas, (prev_x, prev_y) , 5, color, brush_thickness)
+                if euclidean_distance(prev_circle_centre, (prev_x, prev_y)) > 45:
+                    Tools.draw_circle(canvas, (prev_x, prev_y) , 45, color, brush_thickness)
+                    prev_circle_centre = (prev_x, prev_y)
             elif Tools.current_tool == 'square':
                 Tools.draw_square(canvas, (prev_x, prev_y), color, brush_thickness)
             else:
                 Tools.draw_brush(canvas, (prev_x, prev_y), (x1, y1), color, brush_thickness)
             prev_x, prev_y = x1, y1
+
 
     gray = cv2.cvtColor(canvas, cv2.COLOR_BGR2GRAY)
     _, inv = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY_INV)
