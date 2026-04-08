@@ -1,7 +1,9 @@
+import time
+
 import cv2
 import numpy as np
 from HandTracker import HandTracker
-
+from Tools import Tools
 
 tracker = HandTracker(1)
 cap = cv2.VideoCapture(0)
@@ -9,8 +11,10 @@ cap = cv2.VideoCapture(0)
 canvas = np.zeros((480, 640, 3), dtype="uint8")
 
 prev_x, prev_y = 0, 0
-color = ( 255, 200, 149)
+color = (255, 200, 149)
 brush_thickness = 2
+Tools = Tools()
+
 
 def fingers_up(lm_list):
     fingers = [lm_list[8][2] < lm_list[6][2], lm_list[12][2] < lm_list[10][2]]
@@ -33,15 +37,15 @@ while True:
         if fingers[0] and fingers[1]:
             prev_x, prev_y = 0, 0
 
-            if y1 < 50:
+            if y1 < 10:
                 if 0 < x1 < 150:
-                    color = (255, 0, 0)  # Blue
+                    color = (255, 0, 0)
 
                 elif 150 < x1 < 300:
-                    color = (0, 255, 0)  # Green
+                    color = (0, 255, 0)
 
                 elif 300 < x1 < 450:
-                    color = (0, 0, 255)  # Red
+                    color = (0, 0, 255)
 
                 elif 450 < x1 < 640:
                     canvas = np.zeros((480, 640, 3), np.uint8)
@@ -49,7 +53,12 @@ while True:
             if prev_x == 0 and prev_y == 0:
                 prev_x, prev_y = x1, y1
 
-            cv2.line(canvas, (prev_x, prev_y), (x1, y1), color, brush_thickness)
+            if Tools.current_tool == 'circle':
+                Tools.draw_circle(canvas, (prev_x, prev_y) , 5, color, brush_thickness)
+            elif Tools.current_tool == 'square':
+                Tools.draw_square(canvas, (prev_x, prev_y), color, brush_thickness)
+            else:
+                Tools.draw_brush(canvas, (prev_x, prev_y), (x1, y1), color, brush_thickness)
             prev_x, prev_y = x1, y1
 
     gray = cv2.cvtColor(canvas, cv2.COLOR_BGR2GRAY)
@@ -60,10 +69,10 @@ while True:
     img = cv2.bitwise_or(img, canvas)
 
     # UI bar
-    cv2.rectangle(img, (0, 0), (150, 50), (255, 0, 0), -1)
-    cv2.rectangle(img, (150, 0), (300, 50), (0, 255, 0), -1)
-    cv2.rectangle(img, (300, 0), (450, 50), (0, 0, 255), -1)
-    cv2.rectangle(img, (450, 0), (640, 50), (0, 0, 0), -1)
+    cv2.rectangle(img, (0, 0), (150, 10), (255, 0, 0), -1)
+    cv2.rectangle(img, (150, 0), (300, 10), (0, 255, 0), -1)
+    cv2.rectangle(img, (300, 0), (450, 10), (0, 0, 255), -1)
+    cv2.rectangle(img, (450, 0), (640, 10), (0, 0, 0), -1)
     connections = [
         (0, 1), (1, 2), (2, 3), (3, 4),
         (0, 5), (5, 6), (6, 7), (7, 8),
@@ -75,7 +84,7 @@ while True:
         if lm_list and len(lm_list) > start:
             x1, y1 = lm_list[start][1], lm_list[start][2]
             x2, y2 = lm_list[end][1], lm_list[end][2]
-            cv2.line(img, (x1, y1), (x2, y2), ( 255, 200, 149), 2)
+            cv2.line(img, (x1, y1), (x2, y2), (255, 200, 149), 2)
 
     cv2.imshow('img', img)
     if cv2.waitKey(1) & 0xFF == 27:
