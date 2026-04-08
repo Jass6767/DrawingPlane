@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from HandTracker import HandTracker
 
+
 tracker = HandTracker(1)
 cap = cv2.VideoCapture(0)
 
