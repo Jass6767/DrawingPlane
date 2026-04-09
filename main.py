@@ -88,7 +88,9 @@ while True:
                     Tools.draw_circle(canvas, (prev_x, prev_y) , 45, color, brush_thickness)
                     prev_circle_centre = (prev_x, prev_y)
             elif Tools.current_tool == 'square':
-                Tools.draw_square(canvas, (prev_x, prev_y), color, brush_thickness)
+                if euclidean_distance(prev_circle_centre, (prev_x, prev_y)) > 45:
+                    Tools.draw_square(canvas, (prev_x, prev_y), color, brush_thickness)
+                    prev_circle_centre = (prev_x, prev_y)
             else:
                 Tools.draw_brush(canvas, (prev_x, prev_y), (x1, y1), color, brush_thickness)
             prev_x, prev_y = x1, y1
