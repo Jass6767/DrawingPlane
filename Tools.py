@@ -1,8 +1,4 @@
-# Define tools here
-from asyncio import current_task
-
 import cv2
-import time
 from typing import Tuple
 
 class Tools:
@@ -39,7 +35,7 @@ class Tools:
         fill = tuple(int(c * 0.5) for c in color)
         diff = 40
 
-        cv2.rectangle(img, (points[0] - diff, points[1] - diff), (points[0]+50, points[1]+50), neon, thickness)
+        cv2.rectangle(img, (points[0] - diff, points[1] - diff), (points[0] + 50, points[1]+50), neon, thickness)
         cv2.rectangle(img, (points[0] - diff, points[1] - diff), (points[0] + 50, points[1] + 50), fill, -1)
 
     def draw_brush(self,canvas, prev: Tuple, x: Tuple , color, brush_thickness):

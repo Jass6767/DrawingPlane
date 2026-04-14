@@ -61,7 +61,6 @@ while True:
             if elapsed_time > 1 and not fist_triggered:
                 Tools.change_tools()
                 current_icon = icons.get(Tools.current_tool, None)
-                # current_icon = icons.get("brush")
                 icon_timer = 15
                 fist_triggered = True
         else:
@@ -121,7 +120,6 @@ while True:
         if abs(fy - smooth_fy) < 3:
             raw_fy = smooth_fy
 
-        # 🎯 Exponential smoothing
         smooth_fx = int(alpha * fx + (1 - alpha) * smooth_fx)
         smooth_fy = int(alpha * fy + (1 - alpha) * smooth_fy)
 

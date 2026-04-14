@@ -8,7 +8,7 @@ class HandTracker:
         self.mp_draw = mp.solutions.drawing_utils
         self.results = None
 
-    def find_hands(self, img, draw=True):
+    def find_hands(self, img):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(img_rgb)
         return img
