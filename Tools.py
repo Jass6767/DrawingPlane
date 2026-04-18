@@ -21,7 +21,7 @@ class Tools:
 
     def get_tools_list(self):
         pass
-        # todo: improve tools and provide a proper tools catalogue
+        # todo: improve tools and provide a proper tools catalogue ..
 
     def draw_circle(self, img, center, radius, color, thickness):
         neon = color
